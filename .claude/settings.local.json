@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias=\"@/*\" --no-git)",
+      "Bash(npx create-next-app@latest boardgamehub --typescript --tailwind --eslint --app --src-dir=false --import-alias=\"@/*\" --no-git)",
+      "Bash(npm install *)",
+      "Bash(npx shadcn@latest init --defaults)",
+      "PowerShell(cd \"E:\\\\projects\\\\ThevidBG\\\\boardgamehub\"; $dirs = @\\(\"app\\\\\\(auth\\)\\\\login\", \"app\\\\\\(auth\\)\\\\register\", \"app\\\\\\(dashboard\\)\\\\collection\", \"app\\\\\\(dashboard\\)\\\\matches\", \"app\\\\\\(dashboard\\)\\\\players\", \"app\\\\\\(dashboard\\)\\\\wishlist\", \"app\\\\\\(dashboard\\)\\\\stats\"\\); foreach \\($d in $dirs\\) { New-Item -ItemType Directory -Path $d -Force | Out-Null }; Write-Host \"Done\")"
+    ]
+  }
+}
