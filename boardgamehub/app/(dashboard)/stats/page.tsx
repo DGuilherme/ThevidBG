@@ -1,21 +1,20 @@
 import type { Metadata } from 'next'
 import { BarChart2, Trophy, Flame, TrendingUp, Clock } from 'lucide-react'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { getCollection, getShelfOfShame } from '@/lib/supabase/queries/collection'
-import { getMatches } from '@/lib/supabase/queries/matches'
-import { getPlayers } from '@/lib/supabase/queries/players'
+import { getSession } from '@/lib/session'
+import { getCollection, getShelfOfShame } from '@/lib/db/queries/collection'
+import { getMatches } from '@/lib/db/queries/matches'
+import { getPlayers } from '@/lib/db/queries/players'
 
 export const metadata: Metadata = { title: 'Stats' }
 
 export default async function StatsPage() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const session = await getSession()
 
   const [collection, shame, matches, players] = await Promise.all([
-    getCollection(supabase, user!.id),
-    getShelfOfShame(supabase, user!.id),
-    getMatches(supabase, user!.id, 500),
-    getPlayers(supabase, user!.id),
+    getCollection(session.userId),
+    getShelfOfShame(session.userId),
+    getMatches(session.userId, 500),
+    getPlayers(session.userId),
   ])
 
   if (collection.length === 0) {
@@ -99,7 +98,6 @@ export default async function StatsPage() {
                   <span className="text-sm font-medium flex-1 truncate">{g.title}</span>
                   <span className="text-xs text-muted-foreground shrink-0 tabular-nums">{g.count}×</span>
                 </div>
-                {/* Bar */}
                 <div className="ml-7 h-1.5 rounded-full bg-muted overflow-hidden">
                   <div
                     className="h-full rounded-full bg-primary transition-all"

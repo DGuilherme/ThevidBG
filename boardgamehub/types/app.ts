@@ -1,13 +1,14 @@
-import type { Database } from './database'
+import type {
+  User,
+  GameCollection,
+  Player,
+  MatchLog,
+  MatchPlayer,
+  WishlistItem,
+} from '@/lib/db/schema'
 
-export type User = Database['public']['Tables']['users']['Row']
-export type GameCollection = Database['public']['Tables']['games_collection']['Row']
-export type Player = Database['public']['Tables']['players']['Row']
-export type MatchLog = Database['public']['Tables']['match_logs']['Row']
-export type MatchPlayer = Database['public']['Tables']['match_players']['Row']
-export type WishlistItem = Database['public']['Tables']['wishlist']['Row']
+export type { User, GameCollection, Player, MatchLog, MatchPlayer, WishlistItem }
 
-// Composite types used in the UI
 export type MatchWithDetails = MatchLog & {
   game: Pick<GameCollection, 'id' | 'title' | 'image_url' | 'thumbnail_url'>
   players: (MatchPlayer & { player: Player })[]

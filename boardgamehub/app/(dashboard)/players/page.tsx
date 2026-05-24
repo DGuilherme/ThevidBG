@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Users, Trash2, UserPlus } from 'lucide-react'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { getPlayers } from '@/lib/supabase/queries/players'
+import { getSession } from '@/lib/session'
+import { getPlayers } from '@/lib/db/queries/players'
 import { createPlayerAction, deletePlayerAction } from '@/app/actions/players'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,9 +20,8 @@ const avatarColors = [
 ]
 
 export default async function PlayersPage() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const players = await getPlayers(supabase, user!.id)
+  const session = await getSession()
+  const players = await getPlayers(session.userId)
 
   return (
     <div className="space-y-6 max-w-xl">

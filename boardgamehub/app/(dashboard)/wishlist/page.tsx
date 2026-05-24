@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Heart, Trash2, BookOpen } from 'lucide-react'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { getWishlist } from '@/lib/supabase/queries/wishlist'
+import { getSession } from '@/lib/session'
+import { getWishlist } from '@/lib/db/queries/wishlist'
 import { removeFromWishlist } from '@/app/actions/wishlist'
 import { AddWishlistButton } from '@/components/wishlist/AddWishlistButton'
 import { Button } from '@/components/ui/button'
@@ -19,9 +19,8 @@ const priority: Record<number, { label: string; dot: string }> = {
 }
 
 export default async function WishlistPage() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const items = await getWishlist(supabase, user!.id)
+  const session = await getSession()
+  const items = await getWishlist(session.userId)
 
   return (
     <div className="space-y-6">
@@ -40,7 +39,7 @@ export default async function WishlistPage() {
           <Heart className="size-12 text-muted-foreground/30" />
           <div>
             <p className="font-semibold">Your wishlist is empty</p>
-            <p className="text-sm text-muted-foreground mt-1">Add games you'd like to own someday.</p>
+            <p className="text-sm text-muted-foreground mt-1">Add games you&apos;d like to own someday.</p>
           </div>
         </div>
       ) : (

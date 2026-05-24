@@ -1,46 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
+import { unsealData } from 'iron-session'
+import type { SessionData } from '@/lib/session'
+import { SESSION_COOKIE } from '@/lib/session'
 
 const protectedPrefixes = ['/dashboard', '/collection', '/matches', '/players', '/stats', '/wishlist']
 const authRoutes = ['/login', '/register']
 
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
-  let response = NextResponse.next({ request: req })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return req.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value))
-          response = NextResponse.next({ request: req })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-
-  const { data: { user } } = await supabase.auth.getUser()
 
   const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p))
   const isAuthRoute = authRoutes.includes(pathname)
 
-  if (isProtected && !user) {
+  if (!isProtected && !isAuthRoute) {
+    return NextResponse.next()
+  }
+
+  let isAuthenticated = false
+  const cookieValue = req.cookies.get(SESSION_COOKIE)?.value
+
+  if (cookieValue) {
+    try {
+      const data = await unsealData<SessionData>(cookieValue, {
+        password: process.env.SESSION_SECRET!,
+      })
+      isAuthenticated = !!data?.userId
+    } catch {
+      isAuthenticated = false
+    }
+  }
+
+  if (isProtected && !isAuthenticated) {
     return NextResponse.redirect(new URL('/login', req.nextUrl))
   }
 
-  if (isAuthRoute && user) {
+  if (isAuthRoute && isAuthenticated) {
     return NextResponse.redirect(new URL('/dashboard', req.nextUrl))
   }
 
-  return response
+  return NextResponse.next()
 }
 
 export const config = {

@@ -1,17 +1,16 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { addGame, removeGame, toggleShelfOfShame } from '@/lib/supabase/mutations/collection'
+import { getSession } from '@/lib/session'
+import { addGame, removeGame, toggleShelfOfShame } from '@/lib/db/mutations/collection'
 import type { BggGameDetail } from '@/types/bgg'
 
 export async function addGameToCollection(bggGame: BggGameDetail) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  const session = await getSession()
+  if (!session.userId) throw new Error('Not authenticated')
 
-  await addGame(supabase, {
-    user_id: user.id,
+  await addGame({
+    user_id: session.userId,
     bgg_id: bggGame.id,
     title: bggGame.name,
     image_url: bggGame.image || null,
@@ -27,13 +26,11 @@ export async function addGameToCollection(bggGame: BggGameDetail) {
 }
 
 export async function removeGameFromCollection(gameId: string) {
-  const supabase = await createServerSupabaseClient()
-  await removeGame(supabase, gameId)
+  await removeGame(gameId)
   revalidatePath('/collection')
 }
 
 export async function toggleShelfOfShameAction(gameId: string, value: boolean) {
-  const supabase = await createServerSupabaseClient()
-  await toggleShelfOfShame(supabase, gameId, value)
+  await toggleShelfOfShame(gameId, value)
   revalidatePath('/collection')
 }

@@ -1,8 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { createMatch, deleteMatch } from '@/lib/supabase/mutations/matches'
+import { getSession } from '@/lib/session'
+import { createMatch, deleteMatch } from '@/lib/db/mutations/matches'
 
 interface LogMatchPayload {
   gameId: string
@@ -18,14 +18,13 @@ interface LogMatchPayload {
 }
 
 export async function logMatchAction(payload: LogMatchPayload): Promise<{ error: string } | undefined> {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const session = await getSession()
+  if (!session.userId) return { error: 'Not authenticated' }
 
   try {
-    await createMatch(supabase, {
+    await createMatch({
       match: {
-        user_id: user.id,
+        user_id: session.userId,
         game_id: payload.gameId,
         date: payload.date,
         duration_minutes: payload.durationMinutes,
@@ -49,8 +48,7 @@ export async function logMatchAction(payload: LogMatchPayload): Promise<{ error:
 }
 
 export async function deleteMatchAction(matchId: string): Promise<void> {
-  const supabase = await createServerSupabaseClient()
-  await deleteMatch(supabase, matchId).catch(() => {})
+  await deleteMatch(matchId).catch(() => {})
   revalidatePath('/matches')
   revalidatePath('/stats')
   revalidatePath('/dashboard')

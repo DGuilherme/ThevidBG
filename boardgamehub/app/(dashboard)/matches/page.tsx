@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { Swords, Crown, Clock, MapPin, Trash2 } from 'lucide-react'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { getMatches } from '@/lib/supabase/queries/matches'
-import { getCollection } from '@/lib/supabase/queries/collection'
-import { getPlayers } from '@/lib/supabase/queries/players'
+import { Swords, Crown, Clock, MapPin, Trash2, BookOpen } from 'lucide-react'
+import { getSession } from '@/lib/session'
+import { getMatches } from '@/lib/db/queries/matches'
+import { getCollection } from '@/lib/db/queries/collection'
+import { getPlayers } from '@/lib/db/queries/players'
 import { deleteMatchAction } from '@/app/actions/matches'
 import { LogMatchFlow } from '@/components/matches/LogMatchFlow'
 import { Button } from '@/components/ui/button'
-import { BookOpen } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Matches' }
 
@@ -21,13 +20,12 @@ function formatDate(dateStr: string) {
 }
 
 export default async function MatchesPage() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const session = await getSession()
 
   const [matches, games, players] = await Promise.all([
-    getMatches(supabase, user!.id, 50),
-    getCollection(supabase, user!.id),
-    getPlayers(supabase, user!.id),
+    getMatches(session.userId, 50),
+    getCollection(session.userId),
+    getPlayers(session.userId),
   ])
 
   return (

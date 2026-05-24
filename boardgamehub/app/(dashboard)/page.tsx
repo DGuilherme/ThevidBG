@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { BookOpen, Swords, Users, TrendingUp, Crown, ArrowRight } from 'lucide-react'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { getCollection } from '@/lib/supabase/queries/collection'
-import { getMatches } from '@/lib/supabase/queries/matches'
-import { getPlayers } from '@/lib/supabase/queries/players'
+import { getSession } from '@/lib/session'
+import { getCollection } from '@/lib/db/queries/collection'
+import { getMatches } from '@/lib/db/queries/matches'
+import { getPlayers } from '@/lib/db/queries/players'
 import { cn } from '@/lib/utils'
 
 export const metadata: Metadata = { title: 'Overview' }
@@ -24,13 +24,12 @@ function greeting() {
 }
 
 export default async function DashboardPage() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const session = await getSession()
 
   const [collection, matches, players] = await Promise.all([
-    getCollection(supabase, user!.id),
-    getMatches(supabase, user!.id, 5),
-    getPlayers(supabase, user!.id),
+    getCollection(session.userId),
+    getMatches(session.userId, 5),
+    getPlayers(session.userId),
   ])
 
   const values = [collection.length, matches.length, players.length]
@@ -51,7 +50,7 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-bold">
           {greeting()} 🎲
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">Here's your board game command center.</p>
+        <p className="text-muted-foreground text-sm mt-1">Here&apos;s your board game command center.</p>
       </div>
 
       {/* Stat cards */}

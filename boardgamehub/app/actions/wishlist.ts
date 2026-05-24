@@ -1,17 +1,19 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { addGame } from '@/lib/supabase/mutations/collection'
+import { getSession } from '@/lib/session'
+import { db } from '@/lib/db'
+import { wishlist } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
+import { addGame } from '@/lib/db/mutations/collection'
 import type { BggGameDetail } from '@/types/bgg'
 
 export async function addToWishlist(bggGame: BggGameDetail, priority = 3) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  const session = await getSession()
+  if (!session.userId) throw new Error('Not authenticated')
 
-  await supabase.from('wishlist').insert({
-    user_id: user.id,
+  await db.insert(wishlist).values({
+    user_id: session.userId,
     bgg_id: bggGame.id,
     title: bggGame.name,
     image_url: bggGame.image || null,
@@ -23,19 +25,17 @@ export async function addToWishlist(bggGame: BggGameDetail, priority = 3) {
 }
 
 export async function removeFromWishlist(itemId: string) {
-  const supabase = await createServerSupabaseClient()
-  await supabase.from('wishlist').delete().eq('id', itemId)
+  await db.delete(wishlist).where(eq(wishlist.id, itemId))
   revalidatePath('/wishlist')
 }
 
 export async function moveToCollection(itemId: string, bggGame: BggGameDetail) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  const session = await getSession()
+  if (!session.userId) throw new Error('Not authenticated')
 
   await Promise.all([
-    addGame(supabase, {
-      user_id: user.id,
+    addGame({
+      user_id: session.userId,
       bgg_id: bggGame.id,
       title: bggGame.name,
       image_url: bggGame.image || null,
@@ -46,7 +46,7 @@ export async function moveToCollection(itemId: string, bggGame: BggGameDetail) {
       year_published: bggGame.yearPublished || null,
       bgg_rating: bggGame.rating || null,
     }),
-    supabase.from('wishlist').delete().eq('id', itemId),
+    db.delete(wishlist).where(eq(wishlist.id, itemId)),
   ])
 
   revalidatePath('/wishlist')

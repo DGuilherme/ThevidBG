@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Trash2, BookOpen } from 'lucide-react'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { getCollection } from '@/lib/supabase/queries/collection'
+import { getSession } from '@/lib/session'
+import { getCollection } from '@/lib/db/queries/collection'
 import { removeGameFromCollection } from '@/app/actions/collection'
 import { AddGameButton } from '@/components/collection/AddGameButton'
 import { Button } from '@/components/ui/button'
@@ -10,9 +10,8 @@ import { Button } from '@/components/ui/button'
 export const metadata: Metadata = { title: 'Collection' }
 
 export default async function CollectionPage() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const games = await getCollection(supabase, user!.id)
+  const session = await getSession()
+  const games = await getCollection(session.userId)
 
   return (
     <div className="space-y-6">

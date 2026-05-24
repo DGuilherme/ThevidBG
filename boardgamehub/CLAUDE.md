@@ -35,23 +35,33 @@ There is no test suite yet. The lint + build pipeline is the quality gate.
 ## Architecture
 
 ```
-lib/          Pure TypeScript — no React, no JSX. Business logic, Supabase queries, BGG parsing.
-components/   Pure UI — no direct DB or API calls.
-hooks/        TanStack Query hooks — the only bridge between lib/ and components/.
-store/        Zustand slices — global client state only.
-app/          Next.js App Router pages, layouts, and server actions.
-app/api/bgg/  BGG proxy route handlers (CORS + caching).
-supabase/     schema.sql and migrations.
-types/        database.ts — generated Supabase types.
+lib/db/         Drizzle schema, DB client, queries/, mutations/ — pure TS, no React.
+lib/session.ts  iron-session helpers (getSession, sessionOptions).
+lib/bgg/        BGG API client and XML parser.
+components/     Pure UI — no direct DB or API calls.
+hooks/          TanStack Query hooks — the only bridge between lib/ and components/.
+store/          Zustand slices — global client state only.
+app/            Next.js App Router pages, layouts, and server actions.
+app/api/bgg/    BGG proxy route handlers (CORS + caching).
+drizzle/        schema.sql (Coolify PostgreSQL init script) and migration files.
+types/          app.ts — composite app types. All base types come from lib/db/schema.ts.
 ```
 
 This separation is intentional: it keeps the mobile migration (Capacitor / React Native) cheap.
 
+## Infrastructure
+
+- **Hosting:** Coolify self-hosted (`coolify.theviddev.org`) — deploy via git push to main.
+- **Database:** PostgreSQL self-hosted, managed by Coolify. Run `drizzle/schema.sql` on first deploy.
+- **Env vars set in Coolify:** `DATABASE_URL`, `SESSION_SECRET` (min 32 chars, random string).
+
 ## Code conventions
 
 - **Next.js 16.2.6 (App Router):** `proxy.ts` replaces `middleware.ts`. `params`, `cookies`, and `headers` are async Promises — always `await` them.
-- **Supabase client:** import `createServerSupabaseClient` from `lib/supabase/server.ts` (never `createClient`).
-- **Supabase types:** `types/database.ts` must use `type` (not `interface`) and include `Relationships: []` on every table — otherwise all `.from()` calls resolve as `never`.
+- **DB client:** import `db` from `@/lib/db`. Schema types come from `@/lib/db/schema`.
+- **Session:** use `getSession()` from `@/lib/session` in server actions. Never read the session cookie manually.
+- **Auth in actions:** check `session.userId` — throw or return error if falsy.
+- **Drizzle snake_case:** schema columns use snake_case property names (e.g. `user_id`, `image_url`) to match existing TypeScript types and avoid refactoring components.
 - **UI components:** use `@base-ui/react` headless primitives. Button lives at `@/components/ui/button`. Never use Radix UI.
 - **Styling:** Tailwind CSS v4, OKLCH color system, dark mode forced via `dark` class on `<html>`. Mobile-first.
 - **Server actions:** actions used directly in `<form action={...}>` must return `Promise<void>`. Use `useActionState` for typed returns.
@@ -62,10 +72,9 @@ This separation is intentional: it keeps the mobile migration (Capacitor / React
 ## What not to do
 
 - Do not call the BGG XML API directly from client-side code.
-- Do not use `interface` in `types/database.ts`.
 - Do not import from Radix UI — this project uses `@base-ui/react`.
 - Do not put React code in `lib/` or database code in `components/`.
 - Do not add features not listed in `SPEC.md` without updating the spec first.
 - Do not skip the lint + build check before marking a task done.
-- Do not use `createClient` from Supabase — use `createServerSupabaseClient`.
+- Do not import from `@supabase/ssr` or `@supabase/supabase-js` — Supabase has been removed.
 - Do not commit `.env.local` — it contains real credentials.

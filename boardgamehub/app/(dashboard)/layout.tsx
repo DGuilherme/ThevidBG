@@ -1,15 +1,14 @@
 import { redirect } from 'next/navigation'
 import { Dices, LogOut } from 'lucide-react'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/session'
 import { logout } from '@/app/actions/auth'
 import { NavLinks } from '@/components/layouts/NavLinks'
 import { MobileNav } from '@/components/layouts/MobileNav'
 import { Button } from '@/components/ui/button'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const session = await getSession()
+  if (!session.userId) redirect('/login')
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -30,7 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
         {/* Footer */}
         <div className="border-t border-sidebar-border p-3 space-y-1">
-          <p className="px-3 text-xs text-muted-foreground truncate">{user.email}</p>
+          <p className="px-3 text-xs text-muted-foreground truncate">{session.email}</p>
           <form action={logout}>
             <Button
               variant="ghost"
