@@ -28,7 +28,7 @@ export async function login(
   await session.save()
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/')
 }
 
 export async function register(
@@ -50,7 +50,7 @@ export async function register(
   await session.save()
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/')
 }
 
 export async function logout() {
