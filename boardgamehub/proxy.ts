@@ -3,13 +3,14 @@ import { unsealData } from 'iron-session'
 import type { SessionData } from '@/lib/session'
 import { SESSION_COOKIE } from '@/lib/session'
 
-const protectedPrefixes = ['/dashboard', '/collection', '/matches', '/players', '/stats', '/wishlist']
+const protectedPrefixes = ['/collection', '/matches', '/players', '/stats', '/wishlist']
+const protectedExact = ['/']
 const authRoutes = ['/login', '/register']
 
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p))
+  const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p)) || protectedExact.includes(pathname)
   const isAuthRoute = authRoutes.includes(pathname)
 
   if (!isProtected && !isAuthRoute) {
@@ -35,7 +36,7 @@ export default async function proxy(req: NextRequest) {
   }
 
   if (isAuthRoute && isAuthenticated) {
-    return NextResponse.redirect(new URL('/dashboard', req.nextUrl))
+    return NextResponse.redirect(new URL('/', req.nextUrl))
   }
 
   return NextResponse.next()
