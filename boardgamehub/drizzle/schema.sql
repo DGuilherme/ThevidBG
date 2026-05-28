@@ -87,6 +87,8 @@ CREATE TABLE IF NOT EXISTS "wishlist" (
 -- Run on existing Coolify PostgreSQL instance.
 -- =============================================================================
 ALTER TABLE "players" ADD COLUMN IF NOT EXISTS "linked_user_id" UUID REFERENCES "users"("id") ON DELETE SET NULL;
+ALTER TABLE "players" ADD COLUMN IF NOT EXISTS "email" TEXT;
+CREATE INDEX IF NOT EXISTS "idx_players_email" ON "players" ("email");
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS "idx_games_collection_user_id" ON "games_collection" ("user_id");

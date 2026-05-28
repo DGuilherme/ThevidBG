@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Users, Trash2, UserPlus } from 'lucide-react'
+import { Users, Trash2, UserPlus, Mail } from 'lucide-react'
 import { getSession } from '@/lib/session'
 import { getPlayers } from '@/lib/db/queries/players'
 import { createPlayerAction, deletePlayerAction } from '@/app/actions/players'
@@ -34,12 +34,26 @@ export default async function PlayersPage() {
       </div>
 
       {/* Add player */}
-      <form action={createPlayerAction} className="flex gap-2">
-        <div className="relative flex-1">
-          <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-          <Input name="name" placeholder="Add a player…" required className="pl-9" />
+      <form action={createPlayerAction} className="rounded-2xl border border-border bg-card p-4 space-y-3">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+            <Input name="name" placeholder="Player name…" required className="pl-9" />
+          </div>
+          <Button type="submit" size="sm">Add</Button>
         </div>
-        <Button type="submit" size="sm">Add</Button>
+        <div className="relative">
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+          <Input
+            name="email"
+            type="email"
+            placeholder="Email (optional)"
+            className="pl-9 text-sm"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          If they sign up with this email, they&apos;ll be linked automatically.
+        </p>
       </form>
 
       {/* Empty state */}

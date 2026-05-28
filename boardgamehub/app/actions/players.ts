@@ -11,7 +11,9 @@ export async function createPlayerAction(formData: FormData) {
   const name = (formData.get('name') as string | null)?.trim()
   if (!name) return
 
-  await createPlayer({ user_id: session.userId, name })
+  const email = (formData.get('email') as string | null)?.trim() || null
+
+  await createPlayer({ user_id: session.userId, name, email })
   revalidatePath('/players')
 }
 

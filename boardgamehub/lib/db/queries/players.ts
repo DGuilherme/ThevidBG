@@ -12,6 +12,7 @@ export async function getPlayers(userId: string): Promise<PlayerWithLink[]> {
       avatar_url: players.avatar_url,
       is_anonymous: players.is_anonymous,
       linked_user_id: players.linked_user_id,
+      email: players.email,
       created_at: players.created_at,
       lu_id: users.id,
       lu_email: users.email,
@@ -29,6 +30,7 @@ export async function getPlayers(userId: string): Promise<PlayerWithLink[]> {
     avatar_url: r.avatar_url,
     is_anonymous: r.is_anonymous,
     linked_user_id: r.linked_user_id,
+    email: r.email,
     created_at: r.created_at,
     linked_user: r.lu_id ? { id: r.lu_id, email: r.lu_email!, username: r.lu_username } : null,
   }))

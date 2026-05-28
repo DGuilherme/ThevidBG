@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { players } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, and, ne, isNull } from 'drizzle-orm'
 import type { NewPlayer } from '@/lib/db/schema'
 
 export async function createPlayer(player: NewPlayer) {
@@ -15,4 +15,18 @@ export async function updatePlayer(id: string, updates: Partial<NewPlayer>) {
 
 export async function deletePlayer(id: string) {
   await db.delete(players).where(eq(players.id, id))
+}
+
+// Called after login/register — links any player records with matching email in other users' rosters.
+export async function autoLinkPlayersByEmail(email: string, userId: string): Promise<void> {
+  await db
+    .update(players)
+    .set({ linked_user_id: userId })
+    .where(
+      and(
+        eq(players.email, email),
+        isNull(players.linked_user_id),
+        ne(players.user_id, userId),
+      )
+    )
 }

@@ -7,6 +7,7 @@ import { users } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { getSession } from '@/lib/session'
 import bcrypt from 'bcryptjs'
+import { autoLinkPlayersByEmail } from '@/lib/db/mutations/players'
 
 function safeRedirect(formData: FormData): string {
   const raw = (formData.get('redirect') as string) || ''
@@ -32,6 +33,8 @@ export async function login(
   session.email = user.email
   await session.save()
 
+  await autoLinkPlayersByEmail(user.email, user.id)
+
   revalidatePath('/', 'layout')
   redirect(safeRedirect(formData))
 }
@@ -53,6 +56,8 @@ export async function register(
   session.userId = user.id
   session.email = user.email
   await session.save()
+
+  await autoLinkPlayersByEmail(user.email, user.id)
 
   revalidatePath('/', 'layout')
   redirect('/')
