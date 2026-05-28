@@ -3,7 +3,7 @@ import { unsealData } from 'iron-session'
 import type { SessionData } from '@/lib/session'
 import { SESSION_COOKIE } from '@/lib/session'
 
-const protectedPrefixes = ['/collection', '/matches', '/players', '/stats', '/wishlist']
+const protectedPrefixes = ['/collection', '/matches', '/players', '/stats', '/wishlist', '/profile']
 const protectedExact = ['/']
 const authRoutes = ['/login', '/register']
 

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { BookOpen, Swords, Users, TrendingUp, Crown, ArrowRight } from 'lucide-react'
 import { getSession } from '@/lib/session'
 import { getCollection } from '@/lib/db/queries/collection'
-import { getMatches } from '@/lib/db/queries/matches'
+import { getMatches, countMatches } from '@/lib/db/queries/matches'
 import { getPlayers } from '@/lib/db/queries/players'
 import { cn } from '@/lib/utils'
 
@@ -26,13 +26,14 @@ function greeting() {
 export default async function DashboardPage() {
   const session = await getSession()
 
-  const [collection, matches, players] = await Promise.all([
+  const [collection, matches, players, totalMatches] = await Promise.all([
     getCollection(session.userId),
     getMatches(session.userId, 5),
     getPlayers(session.userId),
+    countMatches(session.userId),
   ])
 
-  const values = [collection.length, matches.length, players.length]
+  const values = [collection.length, totalMatches, players.length]
 
   // Most played game from matches
   const playCounts: Record<string, { title: string; thumbnail: string | null; count: number }> = {}

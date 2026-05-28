@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { Dices, LogOut } from 'lucide-react'
 import { getSession } from '@/lib/session'
 import { logout } from '@/app/actions/auth'
@@ -29,7 +30,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
         {/* Footer */}
         <div className="border-t border-sidebar-border p-3 space-y-1">
-          <p className="px-3 text-xs text-muted-foreground truncate">{session.email}</p>
+          <Link
+            href="/profile"
+            className="flex items-center gap-2.5 rounded-lg px-3 py-2 hover:bg-sidebar-accent transition-colors"
+          >
+            <div className="size-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+              <span className="text-xs font-bold text-primary">{session.email[0].toUpperCase()}</span>
+            </div>
+            <p className="text-xs text-muted-foreground truncate">{session.email}</p>
+          </Link>
           <form action={logout}>
             <Button
               variant="ghost"
@@ -47,11 +56,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* Main */}
       <div className="flex flex-1 flex-col min-w-0">
         {/* Mobile header */}
-        <header className="md:hidden flex h-14 items-center gap-3 border-b border-border px-4 shrink-0 bg-sidebar">
-          <div className="size-7 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <Dices className="size-3.5 text-primary-foreground" />
+        <header className="md:hidden flex h-14 items-center justify-between border-b border-border px-4 shrink-0 bg-sidebar">
+          <div className="flex items-center gap-3">
+            <div className="size-7 rounded-lg bg-primary flex items-center justify-center shrink-0">
+              <Dices className="size-3.5 text-primary-foreground" />
+            </div>
+            <span className="font-heading font-bold text-sm tracking-tight">BoardGameHub</span>
           </div>
-          <span className="font-heading font-bold text-sm tracking-tight">BoardGameHub</span>
+          <Link
+            href="/profile"
+            className="size-8 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/30 transition-colors"
+          >
+            <span className="text-xs font-bold text-primary">{session.email[0].toUpperCase()}</span>
+          </Link>
         </header>
 
         <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6">{children}</main>
