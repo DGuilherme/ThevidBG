@@ -10,6 +10,10 @@ const authRoutes = ['/login', '/register']
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
+  if (pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL(pathname.replace('/dashboard', '') || '/', req.nextUrl))
+  }
+
   const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p)) || protectedExact.includes(pathname)
   const isAuthRoute = authRoutes.includes(pathname)
 
