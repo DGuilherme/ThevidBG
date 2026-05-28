@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { navLinks } from './NavLinks'
 
 const mobileLinks = navLinks.filter((l) =>
-  ['/dashboard', '/collection', '/matches', '/players', '/wishlist'].includes(l.href)
+  ['/', '/collection', '/matches', '/players', '/wishlist'].includes(l.href)
 )
 
 export function MobileNav() {
@@ -16,8 +16,7 @@ export function MobileNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border bg-sidebar/95 backdrop-blur-md">
       <div className="flex items-center justify-around h-16 px-1 safe-area-bottom">
         {mobileLinks.map(({ href, label, icon: Icon }) => {
-          const isActive =
-            pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
+          const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
           return (
             <Link
               key={href}

@@ -1,63 +1,8 @@
-'use client'
+import type { Metadata } from 'next'
+import { RegisterForm } from '@/components/auth/RegisterForm'
 
-import { useActionState } from 'react'
-import Link from 'next/link'
-import { register } from '@/app/actions/auth'
-import { Button } from '@/components/ui/button'
+export const metadata: Metadata = { title: 'Create account' }
 
 export default function RegisterPage() {
-  const [state, action, pending] = useActionState(register, undefined)
-
-  return (
-    <div className="space-y-6">
-      <div className="space-y-1 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Create account</h1>
-        <p className="text-sm text-muted-foreground">Start tracking your board game collection</p>
-      </div>
-
-      <form action={action} className="space-y-4">
-        <div className="space-y-1.5">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 dark:bg-input/30"
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <label htmlFor="password" className="text-sm font-medium">
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            minLength={8}
-            autoComplete="new-password"
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 dark:bg-input/30"
-          />
-        </div>
-
-        {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
-
-        <Button type="submit" disabled={pending} size="lg" className="w-full">
-          {pending ? 'Creating account…' : 'Create account'}
-        </Button>
-      </form>
-
-      <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{' '}
-        <Link href="/login" className="text-foreground underline-offset-4 hover:underline">
-          Sign in
-        </Link>
-      </p>
-    </div>
-  )
+  return <RegisterForm />
 }

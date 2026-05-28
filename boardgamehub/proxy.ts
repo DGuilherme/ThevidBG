@@ -32,7 +32,9 @@ export default async function proxy(req: NextRequest) {
   }
 
   if (isProtected && !isAuthenticated) {
-    return NextResponse.redirect(new URL('/login', req.nextUrl))
+    const loginUrl = new URL('/login', req.nextUrl)
+    if (pathname !== '/') loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
   if (isAuthRoute && isAuthenticated) {

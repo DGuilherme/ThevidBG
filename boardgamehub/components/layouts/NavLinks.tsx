@@ -6,7 +6,7 @@ import { LayoutGrid, BookOpen, Swords, Users, BarChart2, Heart } from 'lucide-re
 import { cn } from '@/lib/utils'
 
 export const navLinks = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutGrid },
+  { href: '/', label: 'Overview', icon: LayoutGrid },
   { href: '/collection', label: 'Collection', icon: BookOpen },
   { href: '/matches', label: 'Matches', icon: Swords },
   { href: '/players', label: 'Players', icon: Users },
@@ -20,8 +20,7 @@ export function NavLinks() {
   return (
     <nav className="space-y-0.5 px-2 py-3">
       {navLinks.map(({ href, label, icon: Icon }) => {
-        const isActive =
-          pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
+        const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
         return (
           <Link
             key={href}

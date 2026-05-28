@@ -8,6 +8,11 @@ import { eq } from 'drizzle-orm'
 import { getSession } from '@/lib/session'
 import bcrypt from 'bcryptjs'
 
+function safeRedirect(formData: FormData): string {
+  const raw = (formData.get('redirect') as string) || ''
+  return raw.startsWith('/') && !raw.startsWith('//') ? raw : '/'
+}
+
 export async function login(
   _prevState: { error: string } | undefined,
   formData: FormData
@@ -28,7 +33,7 @@ export async function login(
   await session.save()
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect(safeRedirect(formData))
 }
 
 export async function register(

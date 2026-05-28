@@ -19,7 +19,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <div className="size-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <Dices className="size-4 text-primary-foreground" />
           </div>
-          <span className="font-bold text-base tracking-tight">BoardGameHub</span>
+          <span className="font-heading font-bold text-base tracking-tight">BoardGameHub</span>
         </div>
 
         {/* Nav */}
@@ -51,7 +51,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <div className="size-7 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <Dices className="size-3.5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-sm tracking-tight">BoardGameHub</span>
+          <span className="font-heading font-bold text-sm tracking-tight">BoardGameHub</span>
         </header>
 
         <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6">{children}</main>
