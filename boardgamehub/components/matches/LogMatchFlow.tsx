@@ -11,17 +11,17 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { logMatchAction } from '@/app/actions/matches'
 import { cn } from '@/lib/utils'
-import type { GameCollection, Player } from '@/types/app'
+import type { GameCollection, PlayerWithLink } from '@/types/app'
 
 interface PlayerEntry {
-  player: Player
+  player: PlayerWithLink
   isWinner: boolean
   score: string
 }
 
 interface Props {
   games: GameCollection[]
-  players: Player[]
+  players: PlayerWithLink[]
 }
 
 const STEPS = ['Select game', 'Add players', 'Match details'] as const
@@ -60,7 +60,7 @@ export function LogMatchFlow({ games, players }: Props) {
     [games, search],
   )
 
-  function togglePlayer(player: Player) {
+  function togglePlayer(player: PlayerWithLink) {
     setEntries((prev) => {
       if (prev.find((e) => e.player.id === player.id))
         return prev.filter((e) => e.player.id !== player.id)
@@ -257,10 +257,17 @@ export function LogMatchFlow({ games, players }: Props) {
                         onClick={() => togglePlayer(player)}
                         className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors text-left"
                       >
-                        <div className="size-8 rounded-lg bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
+                        <div className="size-8 rounded-lg bg-primary/20 flex items-center justify-center text-xs font-bold text-primary shrink-0">
                           {player.name[0].toUpperCase()}
                         </div>
-                        <span className="text-sm font-medium flex-1">{player.name}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{player.name}</p>
+                          {player.linked_user && (
+                            <p className="text-[10px] text-primary/70 truncate">
+                              @{player.linked_user.username ?? player.linked_user.email.split('@')[0]}
+                            </p>
+                          )}
+                        </div>
                         <Plus className="size-4 text-muted-foreground shrink-0" />
                       </button>
                     ))}

@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { match_logs, match_players, games_collection, players } from '@/lib/db/schema'
-import { eq, desc, inArray, count } from 'drizzle-orm'
+import { eq, desc, inArray, count, and, ne } from 'drizzle-orm'
 import type { MatchWithDetails } from '@/types/app'
 
 type FlatRow = {
@@ -67,6 +67,25 @@ export async function countMatches(userId: string): Promise<number> {
     .from(match_logs)
     .where(eq(match_logs.user_id, userId))
   return Number(result[0]?.n ?? 0)
+}
+
+export async function getMatchesAsLinkedPlayer(userId: string): Promise<MatchWithDetails[]> {
+  const linkedPlayerIds = await db
+    .select({ id: players.id })
+    .from(players)
+    .where(and(eq(players.linked_user_id, userId), ne(players.user_id, userId)))
+
+  if (linkedPlayerIds.length === 0) return []
+
+  const matchIds = await db
+    .selectDistinct({ id: match_players.match_id })
+    .from(match_players)
+    .where(inArray(match_players.player_id, linkedPlayerIds.map((p) => p.id)))
+
+  if (matchIds.length === 0) return []
+
+  const rows = await fetchMatchRows(matchIds.map((r) => r.id))
+  return groupMatchRows(rows)
 }
 
 export async function getMatchById(id: string): Promise<MatchWithDetails | null> {

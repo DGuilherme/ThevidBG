@@ -20,6 +20,10 @@ export type GameWithStats = GameCollection & {
   win_rate: number | null
 }
 
+export type PlayerWithLink = Player & {
+  linked_user: { id: string; email: string; username: string | null } | null
+}
+
 export type PlayerStats = Player & {
   total_matches: number
   wins: number

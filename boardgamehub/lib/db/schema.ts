@@ -58,6 +58,7 @@ export const players = pgTable('players', {
   name: text('name').notNull(),
   avatar_url: text('avatar_url'),
   is_anonymous: boolean('is_anonymous').notNull().default(false),
+  linked_user_id: uuid('linked_user_id').references(() => users.id, { onDelete: 'set null' }),
   created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 

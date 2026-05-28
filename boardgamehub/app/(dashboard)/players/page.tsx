@@ -3,6 +3,7 @@ import { Users, Trash2, UserPlus } from 'lucide-react'
 import { getSession } from '@/lib/session'
 import { getPlayers } from '@/lib/db/queries/players'
 import { createPlayerAction, deletePlayerAction } from '@/app/actions/players'
+import { LinkUserButton } from '@/components/players/LinkUserButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -36,12 +37,7 @@ export default async function PlayersPage() {
       <form action={createPlayerAction} className="flex gap-2">
         <div className="relative flex-1">
           <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-          <Input
-            name="name"
-            placeholder="Add a player…"
-            required
-            className="pl-9"
-          />
+          <Input name="name" placeholder="Add a player…" required className="pl-9" />
         </div>
         <Button type="submit" size="sm">Add</Button>
       </form>
@@ -52,25 +48,32 @@ export default async function PlayersPage() {
           <Users className="size-12 text-muted-foreground/30" />
           <div>
             <p className="font-semibold">No players yet</p>
-            <p className="text-sm text-muted-foreground mt-1">Add your friends and family above.</p>
+            <p className="text-sm text-muted-foreground mt-1">Add people you play with above.</p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+              Link players to their BoardGameHub accounts so their stats sync automatically.
+            </p>
           </div>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {players.map((player, i) => {
-            const color = avatarColors[i % avatarColors.length]
+            const color = player.linked_user ? 'bg-primary' : avatarColors[i % avatarColors.length]
             return (
               <div
                 key={player.id}
-                className="group relative flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-5 hover:border-primary/30 transition-colors"
+                className="group relative flex flex-col items-center gap-2.5 rounded-2xl border border-border bg-card p-5 hover:border-primary/30 transition-colors"
               >
                 {/* Avatar */}
-                <div
-                  className={`size-14 rounded-2xl ${color} flex items-center justify-center text-xl font-black text-white select-none`}
-                >
+                <div className={`size-14 rounded-2xl ${color} flex items-center justify-center text-xl font-black text-white select-none`}>
                   {player.name[0].toUpperCase()}
                 </div>
+
                 <p className="text-sm font-semibold text-center leading-tight">{player.name}</p>
+
+                {/* Link status */}
+                <div className="w-full flex justify-center">
+                  <LinkUserButton playerId={player.id} linkedUser={player.linked_user} />
+                </div>
 
                 {/* Delete */}
                 <form

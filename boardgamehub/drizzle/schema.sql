@@ -82,6 +82,12 @@ CREATE TABLE IF NOT EXISTS "wishlist" (
   CONSTRAINT "uq_user_bgg_wishlist" UNIQUE ("user_id", "bgg_id")
 );
 
+-- =============================================================================
+-- Migration 001 — 2026-05-28: link players to user accounts
+-- Run on existing Coolify PostgreSQL instance.
+-- =============================================================================
+ALTER TABLE "players" ADD COLUMN IF NOT EXISTS "linked_user_id" UUID REFERENCES "users"("id") ON DELETE SET NULL;
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS "idx_games_collection_user_id" ON "games_collection" ("user_id");
 CREATE INDEX IF NOT EXISTS "idx_games_collection_bgg_id"  ON "games_collection" ("bgg_id");
